@@ -1,0 +1,87 @@
+os: westell
+text: 'Westell RMC-700'
+type: environment
+icon: westell
+mib_dir: 
+    - westell
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_humidity, text: Humidity }
+discovery:
+    -
+        sysDescr:
+            - 'RMC-700'
+
+mib: AISYSTEM-MIB:AISYSTEMINV-MIB:AISYSTEM-MIB:AIROSETTA-MIB:AIPERIPHERAL-MIB:AIMEDIATION-MIB:AIIDEFS-MIB:KTXMODULE-MIB:KTXMEASUREMENT-MIB
+modules:
+    sensors:
+        temperature:
+            options:
+                skip_values:
+                -
+                    oid: ktxMeasurementName
+                    op : '=='
+                    value: 'RelHum'
+                -
+                    oid: ktxMeasurementName
+                    op: 'contains'
+                    value: 'Power'
+            data:
+                -
+                    oid: ktxMeasurementTable
+                    value: ktxMeasurementIntervalValue
+                    num_oid: '.1.3.6.1.4.1.539.47.1.1.5.{{ $index }}'
+                    descr: ktxMeasurementName
+        humidity:
+            options:
+                skip_values:
+                -
+                    oid: ktxMeasurementName
+                    op: '=='
+                    value: 'tempF'
+                -
+                    oid: ktxMeasurementName
+                    op: 'contains'
+                    value: 'Power'
+            data:
+                -
+                    oid: ktxMeasurementTable
+                    value: ktxMeasurementIntervalValue
+                    num_oid: '.1.3.6.1.4.1.539.47.1.1.5.{{ $index }}'
+                    descr: ktxMeasurementName
+        state:
+            options:
+                skip_values:
+                -
+                    oid: aiMediationAlarmName
+                    op : 'contains'
+                    value: 'ExtTemp'
+                -
+                    oid: aiMediationAlarmName
+                    op: 'contains'
+                    value: 'Power'
+            data:        
+                -
+                    oid: aiMediationAlarmTable
+                    value: aiMediationAlarmState
+                    num_oid: '.1.3.6.1.4.1.539.42.2.2.1.3.{{ $index }}'
+                    descr: aiMediationAlarmName
+                    state_name: 'Door Sensors'
+                    states:
+                    - { value: 1, generic: 0, graph: 0, descr: Closed }
+                    - { value: 5, generic: 2, graph: 2, descr: Open }
+                    
+        current:
+            options:
+                skip_values:
+                -
+                    oid: ktxMeasurementName
+                    op: 'not_contains'
+                    value: 'Power'
+            data:
+                -
+
+                    oid: ktxMeasurementTable
+                    value: ktxMeasurementIntervalValue
+                    num_oid: '.1.3.6.1.4.1.539.47.1.1.5.{{ $index }}'
+                    descr: ktxMeasurementName
